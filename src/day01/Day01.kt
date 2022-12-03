@@ -1,3 +1,7 @@
+package day01
+
+import readInput
+
 fun main() {
     data class Elf(val calories: Int)
 
