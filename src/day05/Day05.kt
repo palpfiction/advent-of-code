@@ -64,6 +64,19 @@ fun main() {
         return stacks
     }
 
+    fun Command.execute9001(stacks: Arrangement): Arrangement {
+        val crates = mutableListOf<Char>()
+
+        repeat(this.first) {
+            crates.add(stacks[this.second - 1].pop())
+        }
+
+        crates.asReversed()
+            .forEach { stacks[this.third - 1].push(it) }
+
+        return stacks
+    }
+
     fun part1(input: List<String>): String {
         val stacks = parseStacks(input)
         val commands = parseCommands(input)
@@ -74,7 +87,20 @@ fun main() {
         }
 
 
+        return currentArrangement
+            .map { it.last() }
+            .joinToString("", "", "")
+    }
 
+
+    fun part2(input: List<String>): String {
+        val stacks = parseStacks(input)
+        val commands = parseCommands(input)
+
+        var currentArrangement = stacks
+        for (command in commands) {
+            currentArrangement = command.execute9001(currentArrangement)
+        }
 
 
         return currentArrangement
@@ -82,22 +108,18 @@ fun main() {
             .joinToString("", "", "")
     }
 
-
-    fun part2(input: List<String>): Int =
-        TODO()
-
     val testInput = readInput("/day05/Day05_test")
 
     parseCommands(testInput)
 
     println(part1(testInput))
-    //println(part2(testInput))
+    println(part2(testInput))
 
     check(part1(testInput) == "CMZ")
-    //check(part2(testInput) == 4)
+    check(part2(testInput) == "MCD")
 
 
     val input = readInput("/day05/Day05")
     println(part1(input))
-    //println(part2(input))
+    println(part2(input))
 }
