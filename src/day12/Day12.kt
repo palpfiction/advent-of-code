@@ -71,7 +71,7 @@ fun main() {
                         && it.y in map[0].indices
             }
             .filter {
-                map[it.x][it.y].height in 0..map[current.x][current.y].height + 1
+                map[current.x][current.y].height <= map[it.x][it.y].height + 1
             }
     }
 
@@ -90,33 +90,21 @@ fun main() {
         return paths.minBy { it.value }.key
     }
 
-    fun getStart(map: Matrix<Square>): Coordinate {
+    fun getDestination(map: Matrix<Square>): Coordinate {
         for (i in map.indices) {
             for (j in map[0].indices) {
-                if (map[i][j] is Start) return Coordinate(i, j)
+                if (map[i][j] is Destination) return Coordinate(i, j)
             }
         }
         throw IllegalArgumentException()
     }
 
-    fun getStartingSquares(map: Matrix<Square>): List<Coordinate> {
-        val startingSquares = mutableListOf<Coordinate>()
-
-        for (i in map.indices) {
-            for (j in map[0].indices) {
-                if (map[i][j].height == 1) startingSquares.add(Coordinate(i, j))
-            }
-        }
-
-        return startingSquares
-    }
-
-    fun findShortest(start: Coordinate, map: Matrix<Square>): Int {
+    fun findShortest(start: Coordinate, map: Matrix<Square>, shouldStop: (Square) -> Boolean = { false }): Int {
         val paths = mutableMapOf<Coordinate, Int>()
 
         var current = start
 
-        while (map[current.x][current.y] !is Destination) {
+        while (!shouldStop(map[current.x][current.y])) {
             current = exploreSquare(current, map, paths)
         }
 
@@ -126,13 +114,12 @@ fun main() {
 
     fun part1(input: List<String>): Int =
         with(parseMap(input)) {
-            findShortest(getStart(this), this)
+            findShortest(getDestination(this), this, shouldStop = { it is Start })
         }
 
     fun part2(input: List<String>): Int =
         with(parseMap(input)) {
-            getStartingSquares(this)
-                .minOf { start -> findShortest(start, this) }
+            findShortest(getDestination(this), this, shouldStop = { it.height == 1 })
         }
 
     val testInput = readInput("/day12/Day12_test")
@@ -145,6 +132,6 @@ fun main() {
 
 
     val input = readInput("/day12/Day12")
-    // println(part1(input))
+     println(part1(input))
     println(part2(input))
 }
