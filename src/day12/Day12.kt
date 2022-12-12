@@ -91,20 +91,30 @@ fun main() {
     }
 
     fun getStart(map: Matrix<Square>): Coordinate {
-        for (j in map[0].indices) {
-            for (i in map.indices) {
+        for (i in map.indices) {
+            for (j in map[0].indices) {
                 if (map[i][j] is Start) return Coordinate(i, j)
             }
         }
         throw IllegalArgumentException()
     }
 
+    fun getStartingSquares(map: Matrix<Square>): List<Coordinate> {
+        val startingSquares = mutableListOf<Coordinate>()
 
-    fun part1(input: List<String>): Int {
-        val map = parseMap(input)
+        for (i in map.indices) {
+            for (j in map[0].indices) {
+                if (map[i][j].height == 1) startingSquares.add(Coordinate(i, j))
+            }
+        }
+
+        return startingSquares
+    }
+
+    fun findShortest(start: Coordinate, map: Matrix<Square>): Int {
         val paths = mutableMapOf<Coordinate, Int>()
 
-        var current = getStart(map)
+        var current = start
 
         while (map[current.x][current.y] !is Destination) {
             current = exploreSquare(current, map, paths)
@@ -113,18 +123,28 @@ fun main() {
         return paths.getValue(current)
     }
 
-    fun part2(input: List<String>): Int = TODO()
+
+    fun part1(input: List<String>): Int =
+        with(parseMap(input)) {
+            findShortest(getStart(this), this)
+        }
+
+    fun part2(input: List<String>): Int =
+        with(parseMap(input)) {
+            getStartingSquares(this)
+                .minOf { start -> findShortest(start, this) }
+        }
 
     val testInput = readInput("/day12/Day12_test")
 
     println(part1(testInput))
-    //println(part2(testInput))
+    println(part2(testInput))
 
     //check(part1(testInput) == 2)
     //check(part2(testInput) == 4)
 
 
     val input = readInput("/day12/Day12")
-    println(part1(input))
-    //println(part2(input))
+    // println(part1(input))
+    println(part2(input))
 }
